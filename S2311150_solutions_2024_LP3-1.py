@@ -1,3 +1,5 @@
+# C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\Python_code_Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\S2311150_solutions_2024_LP3-1.py
+
 import pandas as pd
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -6,13 +8,14 @@ import pandas as pd
 # Skriv din kod här:
 
 # Load CPI data into a DataFrame
-df_CPI = pd.read_csv('cpi.csv', delimiter=';', encoding='ISO-8859-1')
+df_CPI = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\cpi.csv', delimiter=';', encoding='ISO-8859-1')
+
 
 # Load regional data into a DataFrame
-df_Regions = pd.read_csv('regions.csv', delimiter=';', encoding='ISO-8859-1')
+df_Regions = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\regions.csv', delimiter=';', encoding='ISO-8859-1')
 
 # Load inflation data into a DataFrame
-df_Inflation = pd.read_csv('inflation.csv', encoding='utf-8')
+df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\inflation.csv', encoding='utf-8')
 
 # Merge the regions DataFrame with the CPI DataFrame on the country code
 # This will add 'Land' and 'Kontinent' columns to the CPI data
@@ -31,9 +34,6 @@ print(df_CPI.head(), '\n')
 # Display the first few rows of the merged DataFrame to verify it's correct
 print("printing df_CPI_merged_with_Regions.head()")
 print(df_CPI_merged_with_Regions.head(), '\n')
-
-
-
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 2
