@@ -68,6 +68,10 @@ def plot_inflation(df, countries):
     plt.ylabel('Inflation Rate (%)')
     plt.legend()
     plt.grid(True)
+
+    # Rotate x-axis labels to display years vertically
+    plt.xticks(rotation=90)
+    
     plt.show()
 
 # Input loop for selecting countries
