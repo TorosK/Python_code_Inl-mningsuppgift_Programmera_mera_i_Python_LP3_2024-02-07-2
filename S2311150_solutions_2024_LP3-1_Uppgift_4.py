@@ -81,8 +81,9 @@ for year in range(1961, 2023):  # Start from 1961 since we need the previous yea
 # Initialize a DataFrame to hold aggregated data
 columns = ['Continent', 'Average_Inflation', 'Max_Inflation', 'Max_Inflation_Country', 'Max_Inflation_Year', 'Min_Inflation', 'Min_Inflation_Country', 'Min_Inflation_Year']
 
-# Initialize a DataFrame to hold aggregated data
-aggregated_data = pd.DataFrame(columns=['Continent', 'Average_Inflation', 'Max_Inflation', 'Max_Inflation_Country', 'Max_Inflation_Year', 'Min_Inflation', 'Min_Inflation_Country', 'Min_Inflation_Year'])
+aggregated_data = pd.DataFrame(columns=['Continent', 'Average_Inflation', 'Max_Inflation', 'Max_Inflation_Country', 'Max_Inflation_Year', 'Min_Inflation', 'Min_Inflation_Country', 'Min_Inflation_Year'],
+                               dtype='object')  # You can adjust the dtype according to the expected type of data.
+
 
 # Iterate over each continent
 for continent in df_CPI_merged_with_Regions['Kontinent'].unique():
@@ -117,14 +118,16 @@ for continent in df_CPI_merged_with_Regions['Kontinent'].unique():
         'Min_Inflation': min_inflation,
         'Min_Inflation_Country': min_inflation_country,
         'Min_Inflation_Year': min_inflation_year
-    }])
+    }], columns=aggregated_data.columns)  # Ensuring new_row has the same columns as aggregated_data
 
     # Append the new row to the aggregated_data DataFrame
     # aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
 
     # Before appending the new row to the aggregated_data DataFrame, check if it contains any non-NA data
     if not new_row.isna().all().all():  # Checks if the entire DataFrame 'new_row' is not entirely NA
-        aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
+        new_row_clean = new_row.dropna(how='all', axis=1)  # Drops columns where all values are NA
+        aggregated_data = pd.concat([aggregated_data, new_row_clean], ignore_index=True)
+        # aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
     else:
         print(f"No valid data for continent: {continent}")
 
