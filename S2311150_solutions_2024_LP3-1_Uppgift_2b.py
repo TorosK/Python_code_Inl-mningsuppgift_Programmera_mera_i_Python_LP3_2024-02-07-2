@@ -2,6 +2,7 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 1
@@ -116,7 +117,7 @@ def calculate_change_factors(df, country):
             inflation_current = country_data[str(year)].values[0]
             inflation_previous = country_data[str(year - 1)].values[0]
             if inflation_previous != 0:
-                change_factor = ((inflation_current - inflation_previous) / inflation_previous) * 100
+                change_factor = ((inflation_current - inflation_previous) / inflation_previous)
                 change_factors.append(change_factor)
             else:
                 change_factors.append(None)
@@ -125,15 +126,21 @@ def calculate_change_factors(df, country):
             
     return change_factors
 
-# Function to plot the change factors
+# Function to plot the change factors with every year displayed
 def plot_change_factors(change_factors, country):
     years = list(range(1961, 2023))
-    plt.bar(years, change_factors)
+    plt.figure(figsize=(10, 5))  # Set a larger figure size to accommodate all years
+    plt.bar(years, change_factors, color='blue')
     plt.xlabel('Year')
     plt.ylabel('Change Factor (%)')
-    plt.title(f'{country} - change in inflation compared to the previous year (1960-2022)')
-    plt.grid(True)
-    plt.xticks(rotation=90)
+    plt.title(f'{country} - Change in inflation compared to the previous year (1960-2022)')
+    plt.grid(True)  # This will enable both horizontal and vertical grid lines
+
+    # Set x-axis major tick on each year
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))  # Set a tick for every year
+    plt.xticks(rotation=90, ha='center')  # Rotate the x ticks vertically
+
     plt.tight_layout()  # Adjusts plot to ensure everything fits without overlapping
     plt.show()
 
