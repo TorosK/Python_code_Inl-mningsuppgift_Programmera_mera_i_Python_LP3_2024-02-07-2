@@ -36,185 +36,10 @@ print("printing df_CPI_merged_with_Regions.head()")
 print(df_CPI_merged_with_Regions.head(), '\n')
 
 # ------------------------------------------------------------------------------------------------------------------------
-# Uppgift 2 a
-# Skriv ett program där man först väljer de länder som ska ingå i analysen (max 3 länder). Avsluta inmatningen genom att mata in ordet END. Programmet ska därefter plotta inflationen (CPI) under tidsperioden 1960-2022 för de valda länderna i ett linjediagram... Linjediagrammets titel ska vara ’Inflation under tidsperioden 1960-2022. I graferna ska också högsta- och lägsta förekommande inflation per land markeras med en röd respektive blå cirkel. Ländernas namn ska finnas angivna i diagrammets etikett.
-# ------------------------------------------------------------------------------------------------------------------------
-# Skriv din kod här:
-
-'''
-def plot_inflation(df, countries):
-    """
-    Plot the inflation rate from 1960 to 2022 for the selected countries.
-    The highest and lowest inflation rates are marked with a red and blue dot respectively.
-    """
-    plt.figure(figsize=(10, 5))
-
-    for country in countries:
-        country_data = df[df['Land'] == country].iloc[:, 3:].T
-        country_data.columns = ['Inflation']
-        plt.plot(country_data, label=country)
-
-        # Highlight the max and min inflation values
-        max_value = country_data['Inflation'].max()
-        max_year = country_data['Inflation'].idxmax()
-        min_value = country_data['Inflation'].min()
-        min_year = country_data['Inflation'].idxmin()
-        
-        plt.scatter(max_year, max_value, color='red')
-        plt.scatter(min_year, min_value, color='blue')
-        plt.text(max_year, max_value, f'{max_value:.2f}%', ha='center', va='bottom', color='red')
-        plt.text(min_year, min_value, f'{min_value:.2f}%', ha='center', va='top', color='blue')
-
-    plt.title('Inflation during the years 1960-2022')
-    plt.xlabel('Year')
-    plt.ylabel('Inflation Rate (%)')
-    plt.legend()
-    plt.grid(True)
-
-    # Rotate x-axis labels to display years vertically
-    plt.xticks(rotation=90)
-
-    plt.show()
-
-# Input loop for selecting countries
-selected_countries = []
-print("Enter the names of the countries you want to analyze (max 3). Type 'END' to finish:")
-
-while len(selected_countries) < 3:
-    country = input("Enter country name: ")
-    if country == 'END':
-        break
-    if country in df_CPI_merged_with_Regions['Land'].values:
-        selected_countries.append(country)
-    else:
-        print("Country not found, please enter a valid country name.")
-
-# Plotting the inflation for the selected countries
-if selected_countries:
-    plot_inflation(df_CPI_merged_with_Regions, selected_countries)
-else:
-    print("No countries selected for analysis.")
-'''
-
-# ------------------------------------------------------------------------------------------------------------------------
-# Uppgift 2 b
-# Skriv ett program där man först anger landet som ska analyseras. Beräkna därefter förändringen av inflationen från ett år till ett annat under tidsperioden 1960-2022. Använd formeln för förändringsfaktorn FF(år) enligt formeln: 
-    # 𝐹𝐹(å𝑟)=((𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟)−𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟−1))/(𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟−1)))*100. 
-# Plotta förändringsfaktorerna i ett stapeldiagram...
-# ------------------------------------------------------------------------------------------------------------------------
-# Skriv din kod här:
-
-'''
-# Function to calculate the change factor for inflation
-def calculate_change_factors(df, country):
-    # Filter the DataFrame for the selected country
-    country_data = df[df['Land'] == country].iloc[:, 3:]  # Exclude non-year columns
-    change_factors = []
-    
-    # Calculate the change factor for each year
-    for year in range(1961, 2023):  # Start from 1961 as we need the previous year's data
-        if pd.notna(country_data[str(year)]).all() and pd.notna(country_data[str(year - 1)]).all():
-            inflation_current = country_data[str(year)].values[0]
-            inflation_previous = country_data[str(year - 1)].values[0]
-            if inflation_previous != 0:
-                change_factor = ((inflation_current - inflation_previous) / inflation_previous)
-                change_factors.append(change_factor)
-            else:
-                change_factors.append(None)
-        else:
-            change_factors.append(None)
-            
-    return change_factors
-
-# Function to plot the change factors with every year displayed
-def plot_change_factors(change_factors, country):
-    years = list(range(1961, 2023))
-    plt.figure(figsize=(10, 5))  # Set a larger figure size to accommodate all years
-    plt.bar(years, change_factors, color='blue')
-    plt.xlabel('Year')
-    plt.ylabel('Change Factor (%)')
-    plt.title(f'{country} - Change in inflation compared to the previous year (1960-2022)')
-    plt.grid(True)  # This will enable both horizontal and vertical grid lines
-
-    # Set x-axis major tick on each year
-    ax = plt.gca()
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))  # Set a tick for every year
-    plt.xticks(rotation=90, ha='center')  # Rotate the x ticks vertically
-
-    plt.tight_layout()  # Adjusts plot to ensure everything fits without overlapping
-    plt.show()
-
-# Main function to run the program
-def main():
-    country = input('Enter the name of the country to analyze: ')
-    change_factors = calculate_change_factors(df_CPI_merged_with_Regions, country)
-    plot_change_factors(change_factors, country)
-
-# Run the program
-if __name__ == '__main__':
-    main()
-'''
-
-# ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 3
 # Skriv ett program där man först anger årtalet som ska analyseras och därefter beräknar programmet de 6 länder som hade lägst respektive högst inflation för året ifråga. Informationen ska presenteras i tabellform och i ett stapeldiagram... Vi bortser från de länder som inte rapporterat inflationen för året i fråga.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-'''
-# Function to prompt the user for the year and calculate the top and bottom six inflation rates
-def analyze_inflation(df):
-    # Prompt the user for the year
-    year = input("Ange vilket år som ska analyseras: ").strip()
-    
-    # Check if the year is in the DataFrame
-    if year not in df.columns:
-        print(f"Data for the year {year} is not available.")
-        return
-    
-    # Drop rows with missing values for the specified year
-    df_year = df.dropna(subset=[year])
-    
-    # Convert the year column to numeric values, errors='coerce' will turn the non-convertible strings into NaN
-    df_year[year] = pd.to_numeric(df_year[year], errors='coerce')
-    
-    # Drop rows that could not be converted to numeric values
-    df_year = df_year.dropna(subset=[year])
-    
-    # Sort the DataFrame by the specified year's inflation rate
-    df_sorted = df_year.sort_values(by=year)
-    
-    # Get the six countries with the lowest and highest inflation rates
-    lowest_inflation = df_sorted.head(6)
-    highest_inflation = df_sorted.tail(6)
-    
-    # Create a combined DataFrame for easy plotting
-    combined_inflation = pd.concat([lowest_inflation, highest_inflation])
-    
-    # Plotting the bar chart
-    plt.figure(figsize=(10, 5))
-    plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
-    plt.xlabel('Land')
-    plt.ylabel('Förändring [%]')
-    plt.title(f'De lägsta och högsta inflationerna uppmätta år {year}')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    plt.show()
-    
-    # Displaying the table
-    print("\nLÄNDER MED HÖGST OCH LÄGST INFLATION")
-    print(f"År {year}\n")
-    print("Lägst:")
-    print(lowest_inflation[['Land', year]].to_string(index=False))
-    print("\nHögst:")
-    print(highest_inflation[['Land', year]].to_string(index=False))
-
-# Call the function with the merged DataFrame
-analyze_inflation(df_CPI_merged_with_Regions)
-'''
-
-'''
-# Function to prompt the user for the year and calculate the top and bottom six inflation rates
 def analyze_inflation(df):
     # Prompt the user for the year
     year = input("Enter the year to analyze: ").strip()
@@ -224,78 +49,28 @@ def analyze_inflation(df):
         print(f"Data for the year {year} is not available.")
         return
     
-    # Drop rows with missing values for the specified year
-    df_year = df.dropna(subset=[year])
-    
-    # Convert the year column to numeric values, errors='coerce' will turn the non-convertible strings into NaN
-    df_year[year] = pd.to_numeric(df_year[year], errors='coerce')
-    
-    # Drop rows that could not be converted to numeric values
-    df_year = df_year.dropna(subset=[year])
-    
-    # Sort the DataFrame by the specified year's inflation rate
-    df_sorted = df_year.sort_values(by=year)
-    
-    # Get the six countries with the lowest and highest inflation rates
-    lowest_inflation = df_sorted.head(6)
-    highest_inflation = df_sorted.tail(6)
-    
-    # Create a combined DataFrame for easy plotting
-    combined_inflation = pd.concat([lowest_inflation, highest_inflation])
-    
-    # Plotting the bar chart with English labels
-    plt.figure(figsize=(10, 5))
-    plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
-    plt.xlabel('Country')
-    plt.ylabel('Change [%]')
-    plt.title(f'The lowest and highest inflation rates measured in {year}')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    plt.show()
-    
-    # Displaying the table with English descriptions
-    print("\nCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
-    print(f"Year {year}\n")
-    print("Lowest:")
-    print(lowest_inflation[['Land', year]].to_string(index=False))
-    print("\nHighest:")
-    print(highest_inflation[['Land', year]].to_string(index=False))
-
-# Call the function with the merged DataFrame
-analyze_inflation(df_CPI_merged_with_Regions)
-'''
-
-# Function to prompt the user for the year and calculate the top and bottom six inflation rates
-def analyze_inflation(df):
-    # Prompt the user for the year
-    year = input("Enter the year to analyze: ").strip()
-
-    # Check if the year is in the DataFrame
-    if year not in df.columns:
-        print(f"Data for the year {year} is not available.")
-        return
+    # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+    df_year = df.copy()
 
     # Drop rows with missing values for the specified year
-    df_year = df.dropna(subset=[year])
-
-    # Convert the year column to numeric values, errors='coerce' will turn the non-convertible strings into NaN
-    # Use .loc to avoid SettingWithCopyWarning
+    df_year.dropna(subset=[year], inplace=True)
+    
+    # Convert the year column to numeric values, using .loc to avoid SettingWithCopyWarning
     df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
-
+    
     # Drop rows that could not be converted to numeric values
     df_year.dropna(subset=[year], inplace=True)
-
+    
     # Sort the DataFrame by the specified year's inflation rate
     df_sorted = df_year.sort_values(by=year)
-
+    
     # Get the six countries with the lowest and highest inflation rates
     lowest_inflation = df_sorted.head(6)
     highest_inflation = df_sorted.tail(6)
-
+    
     # Create a combined DataFrame for easy plotting
     combined_inflation = pd.concat([lowest_inflation, highest_inflation])
-
+    
     # Plotting the bar chart with English labels
     plt.figure(figsize=(10, 5))
     plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
@@ -306,29 +81,13 @@ def analyze_inflation(df):
     plt.tight_layout()
     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
     plt.show()
-
+    
     # Displaying the table with English descriptions
     print("\nCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
     print(f"Year {year}\n")
     print("Lowest:")
-    print(lowest_inflation[['Land', year]].to_string(index=False, header=["Land", "Inflation [%]"]))
+    print(lowest_inflation[['Land', year]].to_string(index=False))
     print("\nHighest:")
-    print(highest_inflation[['Land', year]].to_string(index=False, header=["Land", "Inflation [%]"]))
+    print(highest_inflation[['Land', year]].to_string(index=False))
 
 analyze_inflation(df_CPI_merged_with_Regions)
-
-# ------------------------------------------------------------------------------------------------------------------------
-# Uppgift 4
-# ------------------------------------------------------------------------------------------------------------------------
-# Skriv din kod här:
-
-
-
-
-# ------------------------------------------------------------------------------------------------------------------------
-# Uppgift 5
-# ------------------------------------------------------------------------------------------------------------------------
-# Skriv din kod här:
-
-
-
