@@ -39,12 +39,18 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # I denna uppgift ska du analysera inflationen som har uppmätts per kontinent under tidsperioden 1960-2022 enligt den uppdelning som finns i kolumnen Kontinent i df_region. Skriv ett program som använder informationen i df_cpi och df_region och som skapar en tabell som dels presenterar medelinflationen per kontinent under tidsperioden 1960-2022 samt de 3 högsta- och de 3 lägsta förekommande inflationerna per kontinent under tidsperioden och i vilka länder dessa inflationer uppmättes...------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-# Ensure all CPI data columns are numeric
-for year in range(1960, 2023):  # Assuming CPI data spans from 1960 to 2022
-    df_CPI_merged_with_Regions[str(year)] = pd.to_numeric(df_CPI_merged_with_Regions[str(year)], errors='coerce')
+# Initialize an empty DataFrame to hold all inflation data
+inflation_data = pd.DataFrame(index=df_CPI_merged_with_Regions.index)
 
-# Forward fill to address the FutureWarning
-df_CPI_merged_with_Regions.iloc[:, 4:] = df_CPI_merged_with_Regions.iloc[:, 4:].ffill(axis=1)
+# Calculate inflation rates and store them in the inflation_data DataFrame
+for year in range(1961, 2023):  # Start from 1961 since we need the previous year's data to calculate inflation
+    prev_year = str(year - 1)
+    current_year = str(year)
+    inflation_column = f'Inflation_{current_year}'
+    inflation_data[inflation_column] = ((df_CPI_merged_with_Regions[current_year].astype(float) - df_CPI_merged_with_Regions[prev_year].astype(float)) / df_CPI_merged_with_Regions[prev_year].astype(float)) * 100
+
+# Join the inflation data with the main DataFrame
+df_CPI_merged_with_Regions = df_CPI_merged_with_Regions.join(inflation_data)
 
 # Calculate inflation rates as year-over-year changes in CPI
 for year in range(1961, 2023):  # Start from 1961 since we need the previous year's data to calculate inflation
@@ -114,7 +120,13 @@ for continent in df_CPI_merged_with_Regions['Kontinent'].unique():
     }])
 
     # Append the new row to the aggregated_data DataFrame
-    aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
+    # aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
+
+    # Before appending the new row to the aggregated_data DataFrame, check if it contains any non-NA data
+    if not new_row.isna().all().all():  # Checks if the entire DataFrame 'new_row' is not entirely NA
+        aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
+    else:
+        print(f"No valid data for continent: {continent}")
 
 # Print the final aggregated data
 print(aggregated_data)
