@@ -160,6 +160,7 @@ if __name__ == '__main__':
 # Skriv ett program där man först anger årtalet som ska analyseras och därefter beräknar programmet de 6 länder som hade lägst respektive högst inflation för året ifråga. Informationen ska presenteras i tabellform och i ett stapeldiagram... Vi bortser från de länder som inte rapporterat inflationen för året i fråga.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
+'''
 # Function to prompt the user for the year and calculate the top and bottom six inflation rates
 def analyze_inflation(df):
     # Prompt the user for the year
@@ -206,6 +207,58 @@ def analyze_inflation(df):
     print("Lägst:")
     print(lowest_inflation[['Land', year]].to_string(index=False))
     print("\nHögst:")
+    print(highest_inflation[['Land', year]].to_string(index=False))
+
+# Call the function with the merged DataFrame
+analyze_inflation(df_CPI_merged_with_Regions)
+'''
+
+# Function to prompt the user for the year and calculate the top and bottom six inflation rates
+def analyze_inflation(df):
+    # Prompt the user for the year
+    year = input("Enter the year to analyze: ").strip()
+    
+    # Check if the year is in the DataFrame
+    if year not in df.columns:
+        print(f"Data for the year {year} is not available.")
+        return
+    
+    # Drop rows with missing values for the specified year
+    df_year = df.dropna(subset=[year])
+    
+    # Convert the year column to numeric values, errors='coerce' will turn the non-convertible strings into NaN
+    df_year[year] = pd.to_numeric(df_year[year], errors='coerce')
+    
+    # Drop rows that could not be converted to numeric values
+    df_year = df_year.dropna(subset=[year])
+    
+    # Sort the DataFrame by the specified year's inflation rate
+    df_sorted = df_year.sort_values(by=year)
+    
+    # Get the six countries with the lowest and highest inflation rates
+    lowest_inflation = df_sorted.head(6)
+    highest_inflation = df_sorted.tail(6)
+    
+    # Create a combined DataFrame for easy plotting
+    combined_inflation = pd.concat([lowest_inflation, highest_inflation])
+    
+    # Plotting the bar chart with English labels
+    plt.figure(figsize=(10, 5))
+    plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
+    plt.xlabel('Country')
+    plt.ylabel('Change [%]')
+    plt.title(f'The lowest and highest inflation rates measured in {year}')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.show()
+    
+    # Displaying the table with English descriptions
+    print("\nCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
+    print(f"Year {year}\n")
+    print("Lowest:")
+    print(lowest_inflation[['Land', year]].to_string(index=False))
+    print("\nHighest:")
     print(highest_inflation[['Land', year]].to_string(index=False))
 
 # Call the function with the merged DataFrame
