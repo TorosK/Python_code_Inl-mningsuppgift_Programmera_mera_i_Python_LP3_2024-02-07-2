@@ -40,6 +40,8 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Skriv ett program där man först väljer de länder som ska ingå i analysen (max 3 länder). Avsluta inmatningen genom att mata in ordet END. Programmet ska därefter plotta inflationen (CPI) under tidsperioden 1960-2022 för de valda länderna i ett linjediagram... Linjediagrammets titel ska vara ’Inflation under tidsperioden 1960-2022. I graferna ska också högsta- och lägsta förekommande inflation per land markeras med en röd respektive blå cirkel. Ländernas namn ska finnas angivna i diagrammets etikett.
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
+
+'''
 def plot_inflation(df, countries):
     """
     Plot the inflation rate from 1960 to 2022 for the selected countries.
@@ -92,6 +94,7 @@ if selected_countries:
     plot_inflation(df_CPI_merged_with_Regions, selected_countries)
 else:
     print("No countries selected for analysis.")
+'''
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 2 b
@@ -101,8 +104,48 @@ else:
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
+# Function to calculate the change factor for inflation
+def calculate_change_factors(df, country):
+    # Filter the DataFrame for the selected country
+    country_data = df[df['Land'] == country].iloc[:, 3:]  # Exclude non-year columns
+    change_factors = []
+    
+    # Calculate the change factor for each year
+    for year in range(1961, 2023):  # Start from 1961 as we need the previous year's data
+        if pd.notna(country_data[str(year)]).all() and pd.notna(country_data[str(year - 1)]).all():
+            inflation_current = country_data[str(year)].values[0]
+            inflation_previous = country_data[str(year - 1)].values[0]
+            if inflation_previous != 0:
+                change_factor = ((inflation_current - inflation_previous) / inflation_previous) * 100
+                change_factors.append(change_factor)
+            else:
+                change_factors.append(None)
+        else:
+            change_factors.append(None)
+            
+    return change_factors
 
+# Function to plot the change factors
+def plot_change_factors(change_factors, country):
+    years = list(range(1961, 2023))
+    plt.bar(years, change_factors)
+    plt.xlabel('Year')
+    plt.ylabel('Change Factor (%)')
+    plt.title(f'{country} - change in inflation compared to the previous year (1960-2022)')
+    plt.grid(True)
+    plt.xticks(rotation=90)
+    plt.tight_layout()  # Adjusts plot to ensure everything fits without overlapping
+    plt.show()
 
+# Main function to run the program
+def main():
+    country = input('Enter the name of the country to analyze: ')
+    change_factors = calculate_change_factors(df_CPI_merged_with_Regions, country)
+    plot_change_factors(change_factors, country)
+
+# Run the program
+if __name__ == '__main__':
+    main()
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 3

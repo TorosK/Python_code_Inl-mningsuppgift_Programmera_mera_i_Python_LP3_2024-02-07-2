@@ -95,9 +95,6 @@ else:
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 2 b
-# Skriv ett program där man först anger landet som ska analyseras. Beräkna därefter förändringen av inflationen från ett år till ett annat under tidsperioden 1960-2022. Använd formeln för förändringsfaktorn FF(år) enligt formeln: 
-    # 𝐹𝐹(å𝑟)=((𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟)−𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟−1))/(𝑖𝑛𝑓𝑙𝑎𝑡𝑖𝑜𝑛(å𝑟−1)))*100. 
-# Plotta förändringsfaktorerna i ett stapeldiagram...
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
