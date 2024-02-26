@@ -1,5 +1,3 @@
-# C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\Python_code_Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\S2311150_solutions_2024_LP3-1.py
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -41,53 +39,58 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Skriv din kod här:
 
 def analyze_inflation(df):
-    # Prompt the user for the year
+    """
+    Analyzes and displays countries with the highest and lowest inflation rates for a given year.
+    Excludes countries without reported inflation data for the year.
+    Presents results in both tabular and graphical (bar chart) formats.
+    """
+    # Request year input from the user for analysis.
     year = input("Enter the year to analyze: ").strip()
     
-    # Check if the year is in the DataFrame
+    # Verify the presence of the requested year in the data; if absent, notify the user and exit the function.
     if year not in df.columns:
         print(f"Data for the year {year} is not available.")
         return
     
-    # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+    # Create a DataFrame copy to ensure modifications do not affect the original data.
     df_year = df.copy()
 
-    # Drop rows with missing values for the specified year
+    # Remove entries without reported inflation data for the selected year to ensure accurate analysis.
     df_year.dropna(subset=[year], inplace=True)
     
-    # Convert the year column to numeric values, using .loc to avoid SettingWithCopyWarning
+    # Convert inflation data to numeric, ensuring calculations can be performed; non-convertible data is set to NaN.
     df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
     
-    # Drop rows that could not be converted to numeric values
+    # Remove any entries that could not be converted to numeric, ensuring the remaining dataset is clean.
     df_year.dropna(subset=[year], inplace=True)
     
-    # Sort the DataFrame by the specified year's inflation rate
+    # Sort the cleaned dataset by inflation rate to easily identify the highest and lowest values.
     df_sorted = df_year.sort_values(by=year)
     
-    # Get the six countries with the lowest and highest inflation rates
+    # Extract the six countries with the lowest and highest inflation rates for detailed analysis.
     lowest_inflation = df_sorted.head(6)
     highest_inflation = df_sorted.tail(6)
     
-    # Create a combined DataFrame for easy plotting
+    # Combine the two subsets for a consolidated view, facilitating comparison in a single visualization.
     combined_inflation = pd.concat([lowest_inflation, highest_inflation])
     
-    # Plotting the bar chart with English labels
+    # Visualize the selected data as a bar chart, providing a clear graphical representation of the extremes.
     plt.figure(figsize=(10, 5))
     plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
     plt.xlabel('Country')
     plt.ylabel('Change [%]')
     plt.title(f'The lowest and highest inflation rates measured in {year}')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.xticks(rotation=45, ha='right')  # Improve label readability.
+    plt.tight_layout()  # Ensure the plot is neatly arranged without label cut-offs.
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)  # Enhance plot readability with a grid.
     plt.show()
     
-    # Displaying the table with English descriptions
+    # Present the analysis results in a table format, offering a clear, concise textual representation.
     print("\nCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
     print(f"Year {year}\n")
-    print("Lowest:")
+    print("Lowest:")  # Display the countries with the lowest inflation rates.
     print(lowest_inflation[['Land', year]].to_string(index=False))
-    print("\nHighest:")
+    print("\nHighest:")  # Display the countries with the highest inflation rates.
     print(highest_inflation[['Land', year]].to_string(index=False))
 
 analyze_inflation(df_CPI_merged_with_Regions)
