@@ -1,5 +1,3 @@
-# C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\Python_code_Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\S2311150_solutions_2024_LP3-1.py
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -44,51 +42,60 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-# Function to calculate the change factor for inflation
+# This function calculates the annual inflation change factors for a given country.
 def calculate_change_factors(df, country):
-    # Filter the DataFrame for the selected country
-    country_data = df[df['Land'] == country].iloc[:, 3:]  # Exclude non-year columns
-    change_factors = []
-    
-    # Calculate the change factor for each year
-    for year in range(1961, 2023):  # Start from 1961 as we need the previous year's data
+    # Filter the data for the specified country, focusing on columns representing years.
+    country_data = df[df['Land'] == country].iloc[:, 3:]  # Columns from the fourth onward represent years.
+
+    change_factors = []  # Initialize a list to store calculated change factors.
+
+    # Loop through the years 1961-2022. The first year for calculating a change factor is 1961
+    # as it requires the previous year's data for comparison.
+    for year in range(1961, 2023):
+        # Ensure the current and previous year's data are not missing before calculation.
         if pd.notna(country_data[str(year)]).all() and pd.notna(country_data[str(year - 1)]).all():
+            # Retrieve inflation rates for the current and previous years.
             inflation_current = country_data[str(year)].values[0]
             inflation_previous = country_data[str(year - 1)].values[0]
+
+            # Calculate the change factor only if the previous year's inflation rate is non-zero to avoid division by zero.
             if inflation_previous != 0:
                 change_factor = ((inflation_current - inflation_previous) / inflation_previous)
-                change_factors.append(change_factor)
+                change_factors.append(change_factor)  # Append the calculated change factor to the list.
             else:
-                change_factors.append(None)
+                change_factors.append(None)  # Append None if the previous year's inflation rate is zero.
         else:
-            change_factors.append(None)
+            change_factors.append(None)  # Append None if data for the current or previous year is missing.
             
-    return change_factors
+    return change_factors  # Return the list of change factors.
 
-# Function to plot the change factors with every year displayed
+# This function plots the annual change factors for the specified country.
 def plot_change_factors(change_factors, country):
-    years = list(range(1961, 2023))
-    plt.figure(figsize=(10, 5))  # Set a larger figure size to accommodate all years
+    years = list(range(1961, 2023))  # Define the range of years for the x-axis.
+    plt.figure(figsize=(10, 5))  # Set the figure size to ensure clarity and readability.
+
+    # Create a bar plot of change factors over the years, using blue color for bars.
     plt.bar(years, change_factors, color='blue')
-    plt.xlabel('Year')
-    plt.ylabel('Change Factor (%)')
-    plt.title(f'{country} - Change in inflation compared to the previous year (1960-2022)')
-    plt.grid(True)  # This will enable both horizontal and vertical grid lines
+    plt.xlabel('Year')  # Label for the x-axis.
+    plt.ylabel('Change Factor (%)')  # Label for the y-axis.
+    plt.title(f'{country} - Change in inflation compared to the previous year (1960-2022)')  # Plot title with the country's name.
 
-    # Set x-axis major tick on each year
+    plt.grid(True)  # Enable grid lines for better readability of the plot.
+
+    # Customize the x-axis to show a tick for every year for detailed analysis.
     ax = plt.gca()
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))  # Set a tick for every year
-    plt.xticks(rotation=90, ha='center')  # Rotate the x ticks vertically
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))  # Ensures a tick is displayed for every year.
+    plt.xticks(rotation=90, ha='center')  # Rotate the x-axis labels vertically for better readability.
 
-    plt.tight_layout()  # Adjusts plot to ensure everything fits without overlapping
-    plt.show()
+    plt.tight_layout()  # Adjust the layout to make sure everything fits without overlapping.
+    plt.show()  # Display the plot.
 
-# Main function to run the program
+# Main function to initiate the analysis.
 def main():
-    country = input('Enter the name of the country to analyze: ')
-    change_factors = calculate_change_factors(df_CPI_merged_with_Regions, country)
-    plot_change_factors(change_factors, country)
+    country = input('Enter the name of the country to analyze: ')  # Prompt user to enter a country name.
+    change_factors = calculate_change_factors(df_CPI_merged_with_Regions, country)  # Calculate change factors for the entered country.
+    plot_change_factors(change_factors, country)  # Plot the calculated change factors.
 
-# Run the program
+# Entry point of the program.
 if __name__ == '__main__':
-    main()
+    main()  # Execute the main function.
