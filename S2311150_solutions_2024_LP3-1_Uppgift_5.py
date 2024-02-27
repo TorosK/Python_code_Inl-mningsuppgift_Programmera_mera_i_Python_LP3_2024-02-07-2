@@ -36,3 +36,14 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Uppgift 5
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
+
+# Lägg till en 'COUNTRY' kolumn i df_Inflation genom att matcha landskoder med df_Regions
+# Notera att vi döper om 'Land' till 'COUNTRY'
+df_Inflation_With_Country_From_Regions = pd.merge(df_Inflation, df_Regions.rename(columns={'Land': 'COUNTRY'}), left_on='LOCATION', right_on='Landskod', how='left')
+
+# Behåll alla kolumner från df_Inflation och lägg till 'COUNTRY'
+df_Inflation_With_Country_From_Regions = df_Inflation_With_Country_From_Regions[['COUNTRY'] + list(df_Inflation.columns)]
+
+# Visa de första raderna för att kontrollera att allt ser korrekt ut
+print("printing df_Inflation_With_Country_From_Regions.head()", '\n')
+print(df_Inflation_With_Country_From_Regions.head(), '\n')
