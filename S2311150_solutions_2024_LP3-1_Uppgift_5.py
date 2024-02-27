@@ -36,58 +36,96 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 5
+# Skapa ett program där man först väljer ett land (COUNTRY) och därefter ett av de möjliga alternativen kolumnerna 'SUBJECT', 'FREQUENCY' och 'MEASURE' och därefter plottar inflationen under åren 1956–2023 i en linjediagram. De fem (5) år under tidsperioden som hade minst-, respektive högst inflation ska visas i grafen som fyllda cirklar. Diagrammet ska skapas med modulen matplotlib.
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-# Lägg till en 'COUNTRY' kolumn i df_Inflation genom att matcha landskoder med df_Regions
-# Notera att vi döper om 'Land' till 'COUNTRY'
-df_Inflation_With_Country_From_Regions = pd.merge(df_Inflation, df_Regions.rename(columns={'Land': 'COUNTRY'}), left_on='LOCATION', right_on='Landskod', how='left')
+# Enhance df_Inflation by adding a 'COUNTRY' column. This is achieved by leveraging df_Regions
+# to map country codes ('Landskod') to their corresponding country names. This step enriches the
+# inflation data with readable country names, making the dataset more user-friendly and interpretable.
+df_Inflation_With_Country_From_Regions = pd.merge(df_Inflation, df_Regions.rename(columns={'Land': 'COUNTRY'}),
+                                                  left_on='LOCATION', right_on='Landskod', how='left')
 
-# Behåll alla kolumner från df_Inflation och lägg till 'COUNTRY'
+# Consolidate the enhanced dataframe by including all original columns from df_Inflation plus
+# the newly added 'COUNTRY' column. This ensures the dataframe remains comprehensive with the
+# addition of meaningful geographical context.
 df_Inflation_With_Country_From_Regions = df_Inflation_With_Country_From_Regions[['COUNTRY'] + list(df_Inflation.columns)]
 
-# Visa de första raderna för att kontrollera att allt ser korrekt ut
+# Display the first few rows of the updated dataframe as a sanity check to ensure the merge
+# and column addition were performed correctly, confirming the data's integrity.
 print("printing df_Inflation_With_Country_From_Regions.head()", '\n')
 print(df_Inflation_With_Country_From_Regions.head(), '\n')
 
-''''''
 def plot_inflation(df):
+    # Prompt user input for detailed analysis parameters. This interactive approach allows users
+    # to tailor the inflation analysis to specific countries, subjects, frequencies, and measures,
+    # making the function versatile and adaptable to various analytical needs.
     country = input("Ange vilket land som ska analyseras: ").strip()
     subject = input("Ange vilken subject du vill analysera: ").strip()
     frequency = input("Ange vilken frequency du vill analysera: ").strip()
     measure = input("Ange vilken measure du vill analysera: ").strip()
 
+    # Filter the dataframe based on user inputs to isolate the data relevant to the user's
+    # specified criteria. This step ensures that the analysis and resulting plot are focused
+    # and pertinent to the user's inquiry.
     filtered_df = df[(df['COUNTRY'].str.upper() == country.upper()) &
                      (df['SUBJECT'].str.upper() == subject.upper()) &
                      (df['FREQUENCY'].str.upper() == frequency.upper()) &
                      (df['MEASURE'].str.upper() == measure.upper())]
 
+    # In case the filtered dataframe is empty, notify the user, indicating that there are no
+    # records matching their specified criteria. This feedback loop enhances user experience
+    # by providing immediate and clear communication regarding data availability.
     if filtered_df.empty:
         print("Inga data tillgängliga med angivna parametrar.")
         return
 
+    # To avoid potential warnings and ensure data integrity when modifying the dataframe,
+    # create an explicit copy of the filtered dataframe before any alterations.
+    filtered_df = filtered_df.copy()
+
+    # Convert the 'TIME' column to datetime format to facilitate time-series plotting. This
+    # step is crucial for accurate temporal representation and analysis in the resulting plot.
     filtered_df['TIME'] = pd.to_datetime(filtered_df['TIME'], format='%Y')
 
+    # Set up the plot with appropriate dimensions and plot the inflation trend over time.
+    # This visual representation allows for an intuitive understanding of inflation dynamics
+    # within the specified parameters.
     plt.figure(figsize=(12, 6))
-    plt.plot(filtered_df['TIME'], filtered_df['Value'], marker='o', linestyle='-', color='blue')
+    plt.plot(filtered_df['TIME'], filtered_df['Value'], marker='', linestyle='-', color='blue')
 
+    # Identify and highlight the top 5 minimum and maximum inflation values within the filtered
+    # dataset. This emphasis on extreme values provides additional insights into significant
+    # inflation fluctuations over the selected period.
     min_values = filtered_df.nsmallest(5, 'Value')
     max_values = filtered_df.nlargest(5, 'Value')
-    plt.scatter(min_values['TIME'], min_values['Value'], color='red', s=50, label='Minsta Inflation')
-    plt.scatter(max_values['TIME'], max_values['Value'], color='green', s=50, label='Högsta Inflation')
 
+    # Annotate the plot with markers and labels for minimum inflation values, offering a clear
+    # visual cue to the user regarding periods of lowest inflation, enhancing interpretability.
+    for _, row in min_values.iterrows():
+        plt.plot(row['TIME'], row['Value'], marker='o', color='red', markersize=8)
+        plt.text(row['TIME'], row['Value'], f"{row['TIME'].year} (min)", fontsize=9, ha='right')
+
+    # Similarly, annotate the plot with markers and labels for maximum inflation values to
+    # underscore periods of highest inflation, providing a comprehensive view of inflation trends.
+    for _, row in max_values.iterrows():
+        plt.plot(row['TIME'], row['Value'], marker='o', color='green', markersize=8)
+        plt.text(row['TIME'], row['Value'], f"{row['TIME'].year} (max)", fontsize=9, ha='right')
+
+    # Finalize the plot with titles, axis labels, and a custom legend, crafting a fully
+    # informative and visually appealing graphical representation of the inflation analysis.
     plt.title(f'Inflation för {country} ({subject}, {frequency}, {measure})')
     plt.xlabel('År')
     plt.ylabel('Inflation (%)')
-
-    # Ange x-axeln för att visa varje år
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     plt.gca().xaxis.set_major_locator(mdates.YearLocator())
+    plt.xticks(rotation=45)  # Improve readability of the x-axis labels by rotating them.
+    legend_elements = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=8, label='Minsta Inflation'),
+                       plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='green', markersize=8, label='Högsta Inflation')]
+    plt.legend(handles=legend_elements, loc='upper left')
+    plt.grid(True)  # Enhance plot readability by adding a grid.
+    plt.tight_layout()  # Adjust the layout to ensure everything fits without overlapping.
+    plt.show()  # Display the final plot, offering a comprehensive visual analysis of inflation trends.
 
-    plt.xticks(rotation=45)  # Roterar datumetiketterna för bättre läsbarhet
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()  # Justerar subplotparametrar för att ge angivet padding
-    plt.show()
-
+# Assuming df_Inflation_With_Country_From_Regions is already loaded and available for analysis.
 plot_inflation(df_Inflation_With_Country_From_Regions)
