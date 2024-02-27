@@ -38,6 +38,7 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Skriv ett program där man först väljer de länder som ska ingå i analysen (max 3 länder). Avsluta inmatningen genom att mata in ordet END. Programmet ska därefter plotta inflationen (CPI) under tidsperioden 1960-2022 för de valda länderna i ett linjediagram... Linjediagrammets titel ska vara ’Inflation under tidsperioden 1960-2022. I graferna ska också högsta- och lägsta förekommande inflation per land markeras med en röd respektive blå cirkel. Ländernas namn ska finnas angivna i diagrammets etikett.
 # ------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
+
 def plot_inflation(df, countries):
     """
     Creates a line plot to visualize inflation rates from 1960 to 2022 for specified countries.

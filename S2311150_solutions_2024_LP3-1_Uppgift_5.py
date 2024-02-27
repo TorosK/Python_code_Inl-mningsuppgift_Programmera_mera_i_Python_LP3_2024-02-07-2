@@ -127,5 +127,5 @@ def plot_inflation(df):
     plt.tight_layout()  # Adjust the layout to ensure everything fits without overlapping.
     plt.show()  # Display the final plot, offering a comprehensive visual analysis of inflation trends.
 
-# Assuming df_Inflation_With_Country_From_Regions is already loaded and available for analysis.
+# execute
 plot_inflation(df_Inflation_With_Country_From_Regions)
