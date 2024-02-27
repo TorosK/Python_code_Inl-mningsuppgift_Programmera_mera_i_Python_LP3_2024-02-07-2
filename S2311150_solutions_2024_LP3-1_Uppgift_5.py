@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 1
@@ -47,3 +49,45 @@ df_Inflation_With_Country_From_Regions = df_Inflation_With_Country_From_Regions[
 # Visa de första raderna för att kontrollera att allt ser korrekt ut
 print("printing df_Inflation_With_Country_From_Regions.head()", '\n')
 print(df_Inflation_With_Country_From_Regions.head(), '\n')
+
+''''''
+def plot_inflation(df):
+    country = input("Ange vilket land som ska analyseras: ").strip()
+    subject = input("Ange vilken subject du vill analysera: ").strip()
+    frequency = input("Ange vilken frequency du vill analysera: ").strip()
+    measure = input("Ange vilken measure du vill analysera: ").strip()
+
+    filtered_df = df[(df['COUNTRY'].str.upper() == country.upper()) &
+                     (df['SUBJECT'].str.upper() == subject.upper()) &
+                     (df['FREQUENCY'].str.upper() == frequency.upper()) &
+                     (df['MEASURE'].str.upper() == measure.upper())]
+
+    if filtered_df.empty:
+        print("Inga data tillgängliga med angivna parametrar.")
+        return
+
+    filtered_df['TIME'] = pd.to_datetime(filtered_df['TIME'], format='%Y')
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(filtered_df['TIME'], filtered_df['Value'], marker='o', linestyle='-', color='blue')
+
+    min_values = filtered_df.nsmallest(5, 'Value')
+    max_values = filtered_df.nlargest(5, 'Value')
+    plt.scatter(min_values['TIME'], min_values['Value'], color='red', s=50, label='Minsta Inflation')
+    plt.scatter(max_values['TIME'], max_values['Value'], color='green', s=50, label='Högsta Inflation')
+
+    plt.title(f'Inflation för {country} ({subject}, {frequency}, {measure})')
+    plt.xlabel('År')
+    plt.ylabel('Inflation (%)')
+
+    # Ange x-axeln för att visa varje år
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    plt.gca().xaxis.set_major_locator(mdates.YearLocator())
+
+    plt.xticks(rotation=45)  # Roterar datumetiketterna för bättre läsbarhet
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()  # Justerar subplotparametrar för att ge angivet padding
+    plt.show()
+
+plot_inflation(df_Inflation_With_Country_From_Regions)
