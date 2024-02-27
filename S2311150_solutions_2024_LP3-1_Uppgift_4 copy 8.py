@@ -39,46 +39,22 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # I denna uppgift ska du analysera inflationen som har uppmätts per kontinent under tidsperioden 1960-2022 enligt den uppdelning som finns i kolumnen Kontinent i df_region. Skriv ett program som använder informationen i df_cpi och df_region och som skapar en tabell som dels presenterar medelinflationen per kontinent under tidsperioden 1960-2022 samt de 3 högsta- och de 3 lägsta förekommande inflationerna per kontinent under tidsperioden och i vilka länder dessa inflationer uppmättes...------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-# Calculate inflation for each year, ignoring NaN values in the CPI data
-for year in range(1961, 2023):
-    prev_year = str(year - 1)
-    current_year = str(year)
-    inflation_column = f'Inflation_{year}'
-    
-    # Calculate inflation only where CPI data is available for both years
-    valid_data = df_CPI_merged_with_Regions[[prev_year, current_year]].notnull().all(axis=1)
-    df_CPI_merged_with_Regions.loc[valid_data, inflation_column] = (
-        (df_CPI_merged_with_Regions.loc[valid_data, current_year] - df_CPI_merged_with_Regions.loc[valid_data, prev_year]) /
-        df_CPI_merged_with_Regions.loc[valid_data, prev_year]) * 100
+import numpy as np
 
-# Aggregate and summarize inflation data by continent
-summary_list = []
-for continent in df_CPI_merged_with_Regions['Kontinent'].unique():
-    continent_data = df_CPI_merged_with_Regions[df_CPI_merged_with_Regions['Kontinent'] == continent]
-    inflation_columns = [col for col in continent_data if col.startswith('Inflation_')]
-    avg_inflation = continent_data[inflation_columns].mean().mean()
+# Calculate the mean inflation per continent for the period of 1960-2022
+# We first melt the DataFrame to long format, group by continent, and then calculate the mean
+df_melted = df_CPI_merged_with_Regions.melt(id_vars=['Land', 'Landskod', 'Kontinent'], var_name='Year', value_name='Inflation')
+continent_mean_inflation = df_melted.groupby('Kontinent')['Inflation'].mean().reset_index()
+continent_mean_inflation.rename(columns={'Inflation': 'average_yearly_inflation_for_period_1960_2022'}, inplace=True)
 
-    # Flatten the DataFrame for top and bottom 3 inflations
-    flattened = continent_data.melt(id_vars=['Land', 'Kontinent'], value_vars=inflation_columns, var_name='Year', value_name='Inflation').dropna()
-    top_3 = flattened.nlargest(3, 'Inflation')[['Land', 'Year', 'Inflation']].to_dict('records')
-    bottom_3 = flattened.nsmallest(3, 'Inflation')[['Land', 'Year', 'Inflation']].to_dict('records')
+# Now, we find the top 3 and bottom 3 inflation rates per continent
+def top_bottom_inflation(df, n=3):
+    top = df.nlargest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
+    bottom = df.nsmallest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
+    return pd.concat([top, bottom], keys=['Top', 'Bottom'])
 
-    summary_list.append({
-        'Continent': continent,
-        'Average_Inflation': avg_inflation,
-        'Top_3_Inflations': top_3,
-        'Bottom_3_Inflations': bottom_3
-    })
+inflation_extremes = df_melted.groupby('Kontinent').apply(top_bottom_inflation).reset_index().drop('level_1', axis=1)
 
-# Step 4: Summarize and Present Data with Improved Formatting
-df_Summary = pd.DataFrame(summary_list)
-
-def format_inflations(inflations):
-    return ', '.join([f"{item['Land']}: {item['Inflation']:.2f}% in {item['Year'].split('_')[1]}" for item in inflations])
-
-# Apply formatting to the 'Top_3_Inflations' and 'Bottom_3_Inflations' columns
-df_Summary['Top_3_Inflations'] = df_Summary['Top_3_Inflations'].apply(format_inflations)
-df_Summary['Bottom_3_Inflations'] = df_Summary['Bottom_3_Inflations'].apply(format_inflations)
-
-# Display the formatted summary DataFrame
-print(df_Summary.to_string(index=False))
+# Display the result
+print(continent_mean_inflation)
+print(inflation_extremes)
