@@ -21,17 +21,17 @@ df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera
 df_CPI_merged_with_Regions = pd.merge(df_Regions[['Land', 'Landskod', 'Kontinent']], df_CPI, on='Landskod')
 
 # Display the first few rows of the DataFrame to verify it's correct
-print("printing df_Regions.head()")
+print("printing df_Regions.head()", '\n')
 print(df_Regions.head(), '\n')
 
-print("printing df_Inflation.head()")
+print("printing df_Inflation.head()", '\n')
 print(df_Inflation.head(), '\n')
 
-print("printing df_CPI.head()")
+print("printing df_CPI.head()", '\n')
 print(df_CPI.head(), '\n')
 
 # Display the first few rows of the merged DataFrame to verify it's correct
-print("printing df_CPI_merged_with_Regions.head()")
+print("printing df_CPI_merged_with_Regions.head()", '\n')
 print(df_CPI_merged_with_Regions.head(), '\n')
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -56,5 +56,7 @@ def top_bottom_inflation(df, n=3):
 inflation_extremes = df_melted.groupby('Kontinent').apply(top_bottom_inflation).reset_index().drop('level_1', axis=1)
 
 # Display the result
-print(continent_mean_inflation)
-print(inflation_extremes)
+print('printing: continent_mean_inflation\n')
+print(continent_mean_inflation, '\n')
+print('printing: inflation_extremes\n')
+print(inflation_extremes, '\n')
