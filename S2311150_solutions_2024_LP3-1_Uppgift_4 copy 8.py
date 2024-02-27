@@ -1,5 +1,3 @@
-# C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\Python_code_Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\S2311150_solutions_2024_LP3-1.py
-
 import pandas as pd
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -70,3 +68,46 @@ print('printing: continent_mean_inflation\n')
 print(continent_mean_inflation, '\n')
 print('printing: inflation_extremes\n')
 print(inflation_extremes, '\n')
+
+''''''
+
+def calculate_inflation_stats(df):
+    results = {}
+    for continent in df['Kontinent'].unique():
+        continent_data = df[df['Kontinent'] == continent]
+        max_inflation = continent_data.iloc[:, 3:].max(axis=1).max()
+        max_inflation_idx = continent_data.iloc[:, 3:].idxmax(axis=1).iloc[0]
+        max_year = continent_data.columns[3 + continent_data.columns.get_loc(max_inflation_idx)]
+        min_inflation = continent_data.iloc[:, 3:].min(axis=1).min()
+        min_inflation_idx = continent_data.iloc[:, 3:].idxmin(axis=1).iloc[0]
+        min_year = continent_data.columns[3 + continent_data.columns.get_loc(min_inflation_idx)]
+        mean_inflation = continent_data.iloc[:, 3:].mean(axis=1).mean()
+
+        results[continent] = {
+            'Högst Inf [%]': max_inflation,
+            'Högst År': max_year,
+            'Lägst Inf [%]': min_inflation,
+            'Lägst År': min_year,
+            'Medel Inf [%]': mean_inflation
+        }
+
+    return results
+
+# Function to print the formatted table
+def print_formatted_table(stats):
+    # Print the header
+    print("="*81)
+    print("O L I K A\nK O N T I N E N T E R S\nI N F L A T I O N\nU N D E R\nT I D S P E R I O D E N\n1 9 6 0 -- 2 0 2 2")
+    print("-"*81)
+    print(f"{'Kontinent/Land':<20}{'Högst Inf [%]':<10}{'År':<5}{'Lägst Inf [%]':<12}{'År':<5}{'Medel Inf [%]':<15}")
+    print("-"*81)
+
+    # Print the stats for each continent
+    for continent, data in stats.items():
+        print(f"{continent:<20}{data['Högst Inf [%]']:<10.1f}{data['Högst År']:<5}{data['Lägst Inf [%]']:<12.1f}{data['Lägst År']:<5}{data['Medel Inf [%]']:<15.1f}")
+
+# Calculate the inflation statistics
+inflation_stats = calculate_inflation_stats(df_CPI_merged_with_Regions)
+
+# Print the formatted table
+print_formatted_table(inflation_stats)
