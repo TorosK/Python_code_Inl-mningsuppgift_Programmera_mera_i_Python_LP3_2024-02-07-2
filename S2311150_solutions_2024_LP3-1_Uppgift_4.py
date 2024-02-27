@@ -1,5 +1,3 @@
-# C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\Python_code_Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\S2311150_solutions_2024_LP3-1.py
-
 import pandas as pd
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -21,17 +19,17 @@ df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera
 df_CPI_merged_with_Regions = pd.merge(df_Regions[['Land', 'Landskod', 'Kontinent']], df_CPI, on='Landskod')
 
 # Display the first few rows of the DataFrame to verify it's correct
-print("printing df_Regions.head()")
+print("printing df_Regions.head()", '\n')
 print(df_Regions.head(), '\n')
 
-print("printing df_Inflation.head()")
+print("printing df_Inflation.head()", '\n')
 print(df_Inflation.head(), '\n')
 
-print("printing df_CPI.head()")
+print("printing df_CPI.head()", '\n')
 print(df_CPI.head(), '\n')
 
 # Display the first few rows of the merged DataFrame to verify it's correct
-print("printing df_CPI_merged_with_Regions.head()")
+print("printing df_CPI_merged_with_Regions.head()", '\n')
 print(df_CPI_merged_with_Regions.head(), '\n')
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -39,97 +37,74 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # I denna uppgift ska du analysera inflationen som har uppmätts per kontinent under tidsperioden 1960-2022 enligt den uppdelning som finns i kolumnen Kontinent i df_region. Skriv ett program som använder informationen i df_cpi och df_region och som skapar en tabell som dels presenterar medelinflationen per kontinent under tidsperioden 1960-2022 samt de 3 högsta- och de 3 lägsta förekommande inflationerna per kontinent under tidsperioden och i vilka länder dessa inflationer uppmättes...------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-# Initialize an empty DataFrame to hold all inflation data
-inflation_data = pd.DataFrame(index=df_CPI_merged_with_Regions.index)
+import numpy as np
 
-# Calculate inflation rates and store them in the inflation_data DataFrame
-for year in range(1961, 2023):  # Start from 1961 since we need the previous year's data to calculate inflation
-    prev_year = str(year - 1)
-    current_year = str(year)
-    inflation_column = f'Inflation_{current_year}'
-    inflation_data[inflation_column] = ((df_CPI_merged_with_Regions[current_year].astype(float) - df_CPI_merged_with_Regions[prev_year].astype(float)) / df_CPI_merged_with_Regions[prev_year].astype(float)) * 100
+# Calculate the mean inflation per continent for the period of 1960-2022
+# We first melt the DataFrame to long format, group by continent, and then calculate the mean
+df_melted = df_CPI_merged_with_Regions.melt(id_vars=['Land', 'Landskod', 'Kontinent'], var_name='Year', value_name='Inflation')
+continent_mean_inflation = df_melted.groupby('Kontinent')['Inflation'].mean().reset_index()
+continent_mean_inflation.rename(columns={'Inflation': 'average_yearly_inflation_for_period_1960_2022'}, inplace=True)
 
-# Join the inflation data with the main DataFrame
-df_CPI_merged_with_Regions = df_CPI_merged_with_Regions.join(inflation_data)
+# Define the function for finding top and bottom inflations
+def top_bottom_inflation(df, n=3):
+    top = df.nlargest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
+    bottom = df.nsmallest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
+    return pd.concat([top, bottom])
 
-# Calculate inflation rates as year-over-year changes in CPI
-for year in range(1961, 2023):  # Start from 1961 since we need the previous year's data to calculate inflation
-    prev_year = str(year - 1)
-    current_year = str(year)
-    df_CPI_merged_with_Regions[f'Inflation_{current_year}'] = ((df_CPI_merged_with_Regions[current_year] - df_CPI_merged_with_Regions[prev_year]) / df_CPI_merged_with_Regions[prev_year]) * 100
+# Instead of using apply, you can use a for loop and collect the results in a list,
+# which you then concatenate at the end
+extremes_list = []
 
-# Filter for columns that contain 'Inflation_' and 'Kontinent'
-inflation_columns = [col for col in df_CPI_merged_with_Regions.columns if 'Inflation_' in col]
-df_inflation_only = df_CPI_merged_with_Regions[['Kontinent'] + inflation_columns]
+for name, group in df_melted.groupby('Kontinent', group_keys=False):
+    grouped_extremes = top_bottom_inflation(group)
+    grouped_extremes['Kontinent'] = name  # Add the continent name to the results
+    extremes_list.append(grouped_extremes)
 
-# Aggregate inflation data by continent
-aggregated_inflation = df_inflation_only.groupby('Kontinent').agg(['mean', 'max', 'min'])
+# Concatenate all the results into a single DataFrame
+inflation_extremes = pd.concat(extremes_list).reset_index(drop=True)
 
-# Print the aggregated inflation data to verify
-print(aggregated_inflation)
+# Display the result
+print('printing: continent_mean_inflation\n')
+print(continent_mean_inflation, '\n')
+print('printing: inflation_extremes\n')
+print(inflation_extremes, '\n')
 
-# Convert CPI values to numeric, ignoring non-numeric values which will become NaN
-for year in range(1960, 2023):  # Assuming CPI data spans from 1960 to 2022
-    df_CPI_merged_with_Regions[str(year)] = pd.to_numeric(df_CPI_merged_with_Regions[str(year)], errors='coerce')
+''''''
 
-# Calculate inflation rates as year-over-year changes in CPI
-for year in range(1961, 2023):  # Start from 1961 since we need the previous year's data to calculate inflation
-    prev_year = str(year - 1)
-    current_year = str(year)
-    df_CPI_merged_with_Regions[f'Inflation_{current_year}'] = ((df_CPI_merged_with_Regions[current_year] - df_CPI_merged_with_Regions[prev_year]) / df_CPI_merged_with_Regions[prev_year]) * 100
+# Function to print formatted inflation data by continent
+def print_inflation_data(continent_means, inflation_extremes):
+    # Print header for average inflation
+    print("="*81)
+    print("Different Continents average inflation during the time period year 1960 to year 2022")
+    print("-"*65)
+    print("{:<20} {:<40}".format("Continent", "Average inflation 1960-2022:"))
+    print("-"*65)
+    
+    # Loop through each continent's average inflation and print
+    for index, row in continent_means.iterrows():
+        print("{:<20} {:<40}".format(row['Kontinent'], row['average_yearly_inflation_for_period_1960_2022']))
+        
+        # Filter the extremes for the current continent
+        continent_extremes = inflation_extremes[inflation_extremes['Kontinent'] == row['Kontinent']]
+        
+        # Print header for highest and lowest inflation
+        print("\nCountry\t\t\t Highest inflation (%)\t Year")
+        print("-"*65)
+        
+        # Print the top 3 inflations
+        for _, top_row in continent_extremes.nlargest(3, 'Inflation').iterrows():
+            print("{:<20} {:<20} {:<15}".format(top_row['Land'], top_row['Inflation'], top_row['Year']))
+        
+        # Print header for lowest inflation
+        print("\nCountry\t\t\t Lowest inflation (%)\t Year")
+        print("-"*65)
+        
+        # Print the bottom 3 inflations
+        for _, bottom_row in continent_extremes.nsmallest(3, 'Inflation').iterrows():
+            print("{:<20} {:<20} {:<15}".format(bottom_row['Land'], bottom_row['Inflation'], bottom_row['Year']))
+        
+        # Print a separator for the next continent
+        print("\n" + "="*65 + "\n")
 
-# Initialize a DataFrame to hold aggregated data
-columns = ['Continent', 'Average_Inflation', 'Max_Inflation', 'Max_Inflation_Country', 'Max_Inflation_Year', 'Min_Inflation', 'Min_Inflation_Country', 'Min_Inflation_Year']
-
-aggregated_data = pd.DataFrame(columns=['Continent', 'Average_Inflation', 'Max_Inflation', 'Max_Inflation_Country', 'Max_Inflation_Year', 'Min_Inflation', 'Min_Inflation_Country', 'Min_Inflation_Year'],
-                               dtype='object')  # You can adjust the dtype according to the expected type of data.
-
-
-# Iterate over each continent
-for continent in df_CPI_merged_with_Regions['Kontinent'].unique():
-    continent_data = df_CPI_merged_with_Regions[df_CPI_merged_with_Regions['Kontinent'] == continent]
-
-    # Calculate the mean, max, and min inflation for the continent
-    mean_inflation = continent_data[inflation_columns].mean().mean()
-    max_inflation = continent_data[inflation_columns].max().max()
-    min_inflation = continent_data[inflation_columns].min().min()
-
-    # Find the index of the max and min inflation within the continent data
-    max_inflation_idx = continent_data[inflation_columns].max(axis=1).idxmax()
-    min_inflation_idx = continent_data[inflation_columns].min(axis=1).idxmin()
-
-    # Extract the country and year for max inflation
-    max_inflation_country = continent_data.loc[max_inflation_idx, 'Land']
-    max_inflation_year_col = continent_data.loc[max_inflation_idx, inflation_columns].idxmax()
-    max_inflation_year = max_inflation_year_col.split('_')[1]  # Assuming the column name format is 'Inflation_YYYY'
-
-    # Extract the country and year for min inflation
-    min_inflation_country = continent_data.loc[min_inflation_idx, 'Land']
-    min_inflation_year_col = continent_data.loc[min_inflation_idx, inflation_columns].idxmin()
-    min_inflation_year = min_inflation_year_col.split('_')[1]  # Assuming the column name format is 'Inflation_YYYY'
-
-    # Create a new DataFrame row for the current continent's aggregated data
-    new_row = pd.DataFrame([{
-        'Continent': continent,
-        'Average_Inflation': mean_inflation,
-        'Max_Inflation': max_inflation,
-        'Max_Inflation_Country': max_inflation_country,
-        'Max_Inflation_Year': max_inflation_year,
-        'Min_Inflation': min_inflation,
-        'Min_Inflation_Country': min_inflation_country,
-        'Min_Inflation_Year': min_inflation_year
-    }], columns=aggregated_data.columns)  # Ensuring new_row has the same columns as aggregated_data
-
-    # Append the new row to the aggregated_data DataFrame
-    # aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
-
-    # Before appending the new row to the aggregated_data DataFrame, check if it contains any non-NA data
-    if not new_row.isna().all().all():  # Checks if the entire DataFrame 'new_row' is not entirely NA
-        new_row_clean = new_row.dropna(how='all', axis=1)  # Drops columns where all values are NA
-        aggregated_data = pd.concat([aggregated_data, new_row_clean], ignore_index=True)
-        # aggregated_data = pd.concat([aggregated_data, new_row], ignore_index=True)
-    else:
-        print(f"No valid data for continent: {continent}")
-
-# Print the final aggregated data
-print(aggregated_data)
+# Call the function with the continent mean inflation and extremes dataframes
+print_inflation_data(continent_mean_inflation, inflation_extremes)
