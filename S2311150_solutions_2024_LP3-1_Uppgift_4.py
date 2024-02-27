@@ -37,74 +37,73 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # I denna uppgift ska du analysera inflationen som har uppmätts per kontinent under tidsperioden 1960-2022 enligt den uppdelning som finns i kolumnen Kontinent i df_region. Skriv ett program som använder informationen i df_cpi och df_region och som skapar en tabell som dels presenterar medelinflationen per kontinent under tidsperioden 1960-2022 samt de 3 högsta- och de 3 lägsta förekommande inflationerna per kontinent under tidsperioden och i vilka länder dessa inflationer uppmättes...------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
-import numpy as np
-
-# Calculate the mean inflation per continent for the period of 1960-2022
-# We first melt the DataFrame to long format, group by continent, and then calculate the mean
+# Aggregate inflation data per continent over the period 1960-2022.
+# This involves transforming the DataFrame from wide to long format to facilitate group-wise operations.
 df_melted = df_CPI_merged_with_Regions.melt(id_vars=['Land', 'Landskod', 'Kontinent'], var_name='Year', value_name='Inflation')
+
+# Calculate the average inflation for each continent across the entire period.
+# This provides a high-level overview of inflation trends on a continental basis.
 continent_mean_inflation = df_melted.groupby('Kontinent')['Inflation'].mean().reset_index()
 continent_mean_inflation.rename(columns={'Inflation': 'average_yearly_inflation_for_period_1960_2022'}, inplace=True)
 
-# Define the function for finding top and bottom inflations
+# Define a function to identify the extremes in inflation data.
+# This function helps in pinpointing the highest and lowest inflation instances, which are critical for economic analysis.
 def top_bottom_inflation(df, n=3):
     top = df.nlargest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
     bottom = df.nsmallest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
     return pd.concat([top, bottom])
 
-# Instead of using apply, you can use a for loop and collect the results in a list,
-# which you then concatenate at the end
+# Collect extreme inflation values for each continent.
+# This loop iterates over each continent, applying the top_bottom_inflation function to extract significant data points.
 extremes_list = []
 
 for name, group in df_melted.groupby('Kontinent', group_keys=False):
     grouped_extremes = top_bottom_inflation(group)
-    grouped_extremes['Kontinent'] = name  # Add the continent name to the results
+    grouped_extremes['Kontinent'] = name  # Associate the continent name with its corresponding extremes for clarity.
     extremes_list.append(grouped_extremes)
 
-# Concatenate all the results into a single DataFrame
+# Combine all extreme inflation data into a single DataFrame for analysis and presentation.
 inflation_extremes = pd.concat(extremes_list).reset_index(drop=True)
 
-# Display the result
+# Display the calculated average inflation and the extremes.
+# These print statements serve to present the aggregated data in a readable format to the user.
 print('printing: continent_mean_inflation\n')
 print(continent_mean_inflation, '\n')
 print('printing: inflation_extremes\n')
 print(inflation_extremes, '\n')
 
-''''''
-
-# Function to print formatted inflation data by continent
+# Function to format and print the inflation data organized by continent.
+# This function enhances the readability of the data by structuring it in a clear, tabular format.
 def print_inflation_data(continent_means, inflation_extremes):
-    # Print header for average inflation
+    # Print headers and formatting for average inflation data.
     print("="*81)
     print("Different Continents average inflation during the time period year 1960 to year 2022")
     print("-"*65)
     print("{:<20} {:<40}".format("Continent", "Average inflation 1960-2022:"))
     print("-"*65)
     
-    # Loop through each continent's average inflation and print
+    # Iterate through the average inflation data, printing each continent's information.
     for index, row in continent_means.iterrows():
         print("{:<20} {:<40}".format(row['Kontinent'], row['average_yearly_inflation_for_period_1960_2022']))
         
-        # Filter the extremes for the current continent
+        # Extract and print the highest and lowest inflations for the current continent.
         continent_extremes = inflation_extremes[inflation_extremes['Kontinent'] == row['Kontinent']]
-        
-        # Print header for highest and lowest inflation
         print("\nCountry\t\t\t Highest inflation (%)\t Year")
         print("-"*65)
         
-        # Print the top 3 inflations
+        # Display the top 3 highest inflations for insight into peak inflation scenarios.
         for _, top_row in continent_extremes.nlargest(3, 'Inflation').iterrows():
             print("{:<20} {:<20} {:<15}".format(top_row['Land'], top_row['Inflation'], top_row['Year']))
         
-        # Print header for lowest inflation
+        # Display the bottom 3 lowest inflations to highlight instances of minimal inflation or deflation.
         print("\nCountry\t\t\t Lowest inflation (%)\t Year")
         print("-"*65)
         
-        # Print the bottom 3 inflations
         for _, bottom_row in continent_extremes.nsmallest(3, 'Inflation').iterrows():
             print("{:<20} {:<20} {:<15}".format(bottom_row['Land'], bottom_row['Inflation'], bottom_row['Year']))
         
-        # Print a separator for the next continent
+        # Separator for clarity between continents' data.
         print("\n" + "="*65 + "\n")
 
-# Call the function with the continent mean inflation and extremes dataframes
+# Execute the function to display structured inflation data by continent.
 print_inflation_data(continent_mean_inflation, inflation_extremes)
