@@ -19,18 +19,18 @@ df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera
 # This will add 'Land' and 'Kontinent' columns to the CPI data
 df_CPI_merged_with_Regions = pd.merge(df_Regions[['Land', 'Landskod', 'Kontinent']], df_CPI, on='Landskod')
 
-# Display the first few rows of the DataFrame to verify it's correct
-print("printing df_Regions.head()")
+# Display the first few rows of each DataFrame to verify the correctness of the data and the merge operation.
+# This step is crucial for debugging and ensuring that the data is loaded and merged as expected.
+print("printing df_Regions.head()", '\n')
 print(df_Regions.head(), '\n')
 
-print("printing df_Inflation.head()")
+print("printing df_Inflation.head()", '\n')
 print(df_Inflation.head(), '\n')
 
-print("printing df_CPI.head()")
+print("printing df_CPI.head()", '\n')
 print(df_CPI.head(), '\n')
 
-# Display the first few rows of the merged DataFrame to verify it's correct
-print("printing df_CPI_merged_with_Regions.head()")
+print("printing df_CPI_merged_with_Regions.head()", '\n')
 print(df_CPI_merged_with_Regions.head(), '\n')
 
 # ------------------------------------------------------------------------------------------------------------------------
