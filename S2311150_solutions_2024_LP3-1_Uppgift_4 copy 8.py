@@ -47,13 +47,23 @@ df_melted = df_CPI_merged_with_Regions.melt(id_vars=['Land', 'Landskod', 'Kontin
 continent_mean_inflation = df_melted.groupby('Kontinent')['Inflation'].mean().reset_index()
 continent_mean_inflation.rename(columns={'Inflation': 'average_yearly_inflation_for_period_1960_2022'}, inplace=True)
 
-# Now, we find the top 3 and bottom 3 inflation rates per continent
+# Define the function for finding top and bottom inflations
 def top_bottom_inflation(df, n=3):
     top = df.nlargest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
     bottom = df.nsmallest(n, 'Inflation')[['Land', 'Year', 'Inflation']]
-    return pd.concat([top, bottom], keys=['Top', 'Bottom'])
+    return pd.concat([top, bottom])
 
-inflation_extremes = df_melted.groupby('Kontinent').apply(top_bottom_inflation).reset_index().drop('level_1', axis=1)
+# Instead of using apply, you can use a for loop and collect the results in a list,
+# which you then concatenate at the end
+extremes_list = []
+
+for name, group in df_melted.groupby('Kontinent', group_keys=False):
+    grouped_extremes = top_bottom_inflation(group)
+    grouped_extremes['Kontinent'] = name  # Add the continent name to the results
+    extremes_list.append(grouped_extremes)
+
+# Concatenate all the results into a single DataFrame
+inflation_extremes = pd.concat(extremes_list).reset_index(drop=True)
 
 # Display the result
 print('printing: continent_mean_inflation\n')
