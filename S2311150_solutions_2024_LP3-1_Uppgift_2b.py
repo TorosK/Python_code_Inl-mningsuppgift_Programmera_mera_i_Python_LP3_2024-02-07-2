@@ -1,11 +1,23 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 1
 # Skapa DataFrame-objekten df_cpi, df_regions och df_inflation som innehåller en kopia av innehållet i csv-filerna cpi.csv, regions.csv och inflation.csv. Innehållet i dessa DataFrame-objekt ska du sedan använda för att lösa nedanstående uppgifter.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
+
+# I've imported pandas as pd because I need its powerful data manipulation capabilities to work with DataFrames.
+# These DataFrames help me manage the data from the csv files I'm dealing with, such as 'cpi.csv', 'regions.csv',
+# and 'inflation.csv'. Using pandas, I can easily read, clean, and transform this data for my analysis.
+import pandas as pd
+
+# I've imported matplotlib.pyplot as plt because it's essential for my data visualization tasks.
+# With matplotlib, I can create various types of plots, including the bar chart needed for this assignment.
+# It's a versatile library that allows me to customize plots to effectively communicate the data insights.
+import matplotlib.pyplot as plt
+
+# I've imported matplotlib.ticker as ticker because I need more control over the ticks on the axes of my plots,
+# particularly for the x-axis in the bar chart of inflation change factors. The ticker module provides classes
+# and functions to customize tick locations and formats, enabling me to make the plot's x-axis more readable
+# by setting a specific interval for the ticks, which is crucial for displaying each year distinctly.
+import matplotlib.ticker as ticker
 
 # Load CPI data into a DataFrame
 df_CPI = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\cpi.csv', delimiter=';', encoding='ISO-8859-1')

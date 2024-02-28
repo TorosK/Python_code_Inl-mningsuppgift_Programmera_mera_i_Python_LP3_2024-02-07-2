@@ -1,10 +1,16 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-
 # ------------------------------------------------------------------------------------------------------------------------
 # Uppgift 1
 # Skapa DataFrame-objekten df_cpi, df_regions och df_inflation som innehåller en kopia av innehållet i csv-filerna cpi.csv, regions.csv och inflation.csv. Innehållet i dessa DataFrame-objekt ska du sedan använda för att lösa nedanstående uppgifter.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
+
+# I've imported pandas as pd because I need to work with DataFrames, which are a key feature of pandas.
+# DataFrames allow me to easily read, manipulate, and analyze structured data, such as the contents of csv files.
+import pandas as pd
+
+# I've imported matplotlib.pyplot as plt because I need to create and customize visualizations,
+# specifically line plots for this task. Matplotlib is a comprehensive library for creating static,
+# animated, and interactive visualizations in Python.
+import matplotlib.pyplot as plt
 
 # Load CPI data into a DataFrame
 df_CPI = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\cpi.csv', delimiter=';', encoding='ISO-8859-1')

@@ -3,6 +3,8 @@
 # Skapa DataFrame-objekten df_cpi, df_regions och df_inflation som innehåller en kopia av innehållet i csv-filerna cpi.csv, regions.csv och inflation.csv. Innehållet i dessa DataFrame-objekt ska du sedan använda för att lösa nedanstående uppgifter.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
 
+# I've imported pandas as pd because I need to work with DataFrames, which are a key feature of pandas.
+# DataFrames allow me to easily read, manipulate, and analyze structured data, such as the contents of csv files.
 import pandas as pd
 
 # Explanation: The code below reads CSV files into pandas DataFrames. Each DataFrame represents a different set of data: Consumer Price Index (CPI), regional information, and inflation rates, respectively. These DataFrames will be utilized to perform data analysis and visualization tasks.
