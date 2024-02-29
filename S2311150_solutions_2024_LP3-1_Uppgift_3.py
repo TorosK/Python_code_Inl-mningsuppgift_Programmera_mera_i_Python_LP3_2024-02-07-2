@@ -43,7 +43,7 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Uppgift 3
 # Skriv ett program där man först anger årtalet som ska analyseras och därefter beräknar programmet de 6 länder som hade lägst respektive högst inflation för året ifråga. Informationen ska presenteras i tabellform och i ett stapeldiagram... Vi bortser från de länder som inte rapporterat inflationen för året i fråga.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
-
+'''
 def analyze_inflation(df):
     """
     Analyzes and displays countries with the highest and lowest inflation rates for a given year.
@@ -98,5 +98,57 @@ def analyze_inflation(df):
     print(lowest_inflation[['Land', year]].to_string(index=False))
     print("\nHighest:")  # Display the countries with the highest inflation rates.
     print(highest_inflation[['Land', year]].to_string(index=False))
+
+analyze_inflation(df_CPI_merged_with_Regions)
+'''
+
+def analyze_inflation(df):
+    """
+    Analyzes and displays countries with the highest and lowest inflation rates for a given year.
+    Excludes countries without reported inflation data for the year.
+    Presents results in both tabular and graphical (bar chart) formats.
+    """
+    year = input("Enter the year to analyze: ").strip()
+    
+    if year not in df.columns:
+        print(f"Data for the year {year} is not available.")
+        return
+    
+    df_year = df.copy()
+    df_year.dropna(subset=[year], inplace=True)
+    df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
+    df_year.dropna(subset=[year], inplace=True)
+    df_sorted = df_year.sort_values(by=year)
+    
+    lowest_inflation = df_sorted.head(6)
+    highest_inflation = df_sorted.tail(6).iloc[::-1]  # Reverse the order to display the highest inflation first
+
+    # Round inflation values to one decimal place
+    lowest_inflation[year] = lowest_inflation[year].round(1)
+    highest_inflation[year] = highest_inflation[year].round(1)
+
+    # Plotting
+    combined_inflation = pd.concat([lowest_inflation, highest_inflation])
+    plt.figure(figsize=(10, 5))
+    plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
+    plt.xlabel('Country')
+    plt.ylabel('Change [%]')
+    plt.title(f'The lowest and highest inflation rates measured in {year}')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.show()
+
+    # Formatting and printing the table
+    print("="*85)
+    print("\t\tCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
+    print(f"\t\t\t\tYEAR {year}")
+    print("-"*85)
+    print("\tLowest\t\t\t\t\t\t\tHIGHEST")
+    print("\t------\t\t\t\t\t\t\t-------")
+    print("Country\t\tinflation [%]\t\tCountry\t\t\t\tinflation[%]")
+
+    for low, high in zip(lowest_inflation.iterrows(), highest_inflation.iterrows()):
+        print(f"{low[1]['Land']:<15}{low[1][year]:<25}{high[1]['Land']:<32}{high[1][year]:<15}")
 
 analyze_inflation(df_CPI_merged_with_Regions)
