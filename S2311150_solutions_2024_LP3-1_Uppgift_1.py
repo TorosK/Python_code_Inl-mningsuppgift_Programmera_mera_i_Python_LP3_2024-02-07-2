@@ -11,15 +11,15 @@ import pandas as pd
 
 # Load Consumer Price Index (CPI) data from a CSV file into a DataFrame.
 # This DataFrame will be used to analyze changes in consumer prices over time across different countries.
-df_CPI = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\cpi.csv', delimiter=';', encoding='ISO-8859-1')
+df_CPI = pd.read_csv('cpi.csv', delimiter=';', encoding='ISO-8859-1')
 
 # Load regional information from a CSV file into a DataFrame.
 # This DataFrame enriches the CPI data with geographical context, enabling regional analysis.
-df_Regions = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\regions.csv', delimiter=';', encoding='ISO-8859-1')
+df_Regions = pd.read_csv('regions.csv', delimiter=';', encoding='ISO-8859-1')
 
 # Load inflation rate data from a CSV file into a DataFrame.
 # This DataFrame provides additional economic indicators that can be correlated with the CPI data for comprehensive analysis.
-df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\inflation.csv', encoding='utf-8')
+df_Inflation = pd.read_csv('inflation.csv', encoding='utf-8')
 
 # Merge the regional information into the CPI DataFrame using the country code as a key.
 # This operation enriches the CPI data with 'Country' and 'Continent' columns, allowing for more detailed regional analysis.

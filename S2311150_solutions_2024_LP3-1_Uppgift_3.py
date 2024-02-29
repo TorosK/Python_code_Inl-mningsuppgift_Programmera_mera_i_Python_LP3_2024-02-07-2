@@ -12,14 +12,14 @@ import pandas as pd
 # animated, and interactive visualizations in Python.
 import matplotlib.pyplot as plt
 
-# Load CPI data into a DataFrame
-df_CPI = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\cpi.csv', delimiter=';', encoding='ISO-8859-1')
+# Load Consumer Price Index (CPI) data from a CSV file into a DataFrame.
+df_CPI = pd.read_csv('cpi.csv', delimiter=';', encoding='ISO-8859-1')
 
-# Load regional data into a DataFrame
-df_Regions = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\regions.csv', delimiter=';', encoding='ISO-8859-1')
+# Load regional information from a CSV file into a DataFrame.
+df_Regions = pd.read_csv('regions.csv', delimiter=';', encoding='ISO-8859-1')
 
-# Load inflation data into a DataFrame
-df_Inflation = pd.read_csv(r'C:\Users\TorosKutlu\Desktop\Borås Programmera mera i Python\Inlämningsuppgift_Programmera_mera_i_Python_LP3_2024-02-07-2\inflation.csv', encoding='utf-8')
+# Load inflation rate data from a CSV file into a DataFrame.
+df_Inflation = pd.read_csv('inflation.csv', encoding='utf-8')
 
 # Merge the regions DataFrame with the CPI DataFrame on the country code
 # This will add 'Land' and 'Kontinent' columns to the CPI data
