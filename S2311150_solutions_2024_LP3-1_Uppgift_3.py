@@ -43,64 +43,6 @@ print(df_CPI_merged_with_Regions.head(), '\n')
 # Uppgift 3
 # Skriv ett program där man först anger årtalet som ska analyseras och därefter beräknar programmet de 6 länder som hade lägst respektive högst inflation för året ifråga. Informationen ska presenteras i tabellform och i ett stapeldiagram... Vi bortser från de länder som inte rapporterat inflationen för året i fråga.------------------------------------------------------------------------------------------------------------------------
 # Skriv din kod här:
-'''
-def analyze_inflation(df):
-    """
-    Analyzes and displays countries with the highest and lowest inflation rates for a given year.
-    Excludes countries without reported inflation data for the year.
-    Presents results in both tabular and graphical (bar chart) formats.
-    """
-    # Request year input from the user for analysis.
-    year = input("Enter the year to analyze: ").strip()
-    
-    # Verify the presence of the requested year in the data; if absent, notify the user and exit the function.
-    if year not in df.columns:
-        print(f"Data for the year {year} is not available.")
-        return
-    
-    # Create a DataFrame copy to ensure modifications do not affect the original data.
-    df_year = df.copy()
-
-    # Remove entries without reported inflation data for the selected year to ensure accurate analysis.
-    df_year.dropna(subset=[year], inplace=True)
-    
-    # Convert inflation data to numeric, ensuring calculations can be performed; non-convertible data is set to NaN.
-    df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
-    
-    # Remove any entries that could not be converted to numeric, ensuring the remaining dataset is clean.
-    df_year.dropna(subset=[year], inplace=True)
-    
-    # Sort the cleaned dataset by inflation rate to easily identify the highest and lowest values.
-    df_sorted = df_year.sort_values(by=year)
-    
-    # Extract the six countries with the lowest and highest inflation rates for detailed analysis.
-    lowest_inflation = df_sorted.head(6)
-    highest_inflation = df_sorted.tail(6)
-    
-    # Combine the two subsets for a consolidated view, facilitating comparison in a single visualization.
-    combined_inflation = pd.concat([lowest_inflation, highest_inflation])
-    
-    # Visualize the selected data as a bar chart, providing a clear graphical representation of the extremes.
-    plt.figure(figsize=(10, 5))
-    plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
-    plt.xlabel('Country')
-    plt.ylabel('Change [%]')
-    plt.title(f'The lowest and highest inflation rates measured in {year}')
-    plt.xticks(rotation=45, ha='right')  # Improve label readability.
-    plt.tight_layout()  # Ensure the plot is neatly arranged without label cut-offs.
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)  # Enhance plot readability with a grid.
-    plt.show()
-    
-    # Present the analysis results in a table format, offering a clear, concise textual representation.
-    print("\nCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
-    print(f"Year {year}\n")
-    print("Lowest:")  # Display the countries with the lowest inflation rates.
-    print(lowest_inflation[['Land', year]].to_string(index=False))
-    print("\nHighest:")  # Display the countries with the highest inflation rates.
-    print(highest_inflation[['Land', year]].to_string(index=False))
-
-analyze_inflation(df_CPI_merged_with_Regions)
-'''
 
 def analyze_inflation(df):
     """
