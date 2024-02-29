@@ -108,47 +108,83 @@ def analyze_inflation(df):
     Excludes countries without reported inflation data for the year.
     Presents results in both tabular and graphical (bar chart) formats.
     """
+    # Request year input from the user for analysis.
     year = input("Enter the year to analyze: ").strip()
     
+    # Verify the presence of the requested year in the data; if absent, notify the user and exit the function.
     if year not in df.columns:
         print(f"Data for the year {year} is not available.")
         return
     
+    # Create a DataFrame copy to ensure modifications do not affect the original data.
     df_year = df.copy()
-    df_year.dropna(subset=[year], inplace=True)
-    df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
-    df_year.dropna(subset=[year], inplace=True)
-    df_sorted = df_year.sort_values(by=year)
-    
-    lowest_inflation = df_sorted.head(6)
-    highest_inflation = df_sorted.tail(6).iloc[::-1]  # Reverse the order to display the highest inflation first
 
-    # Round inflation values to one decimal place
-    lowest_inflation[year] = lowest_inflation[year].round(1)
-    highest_inflation[year] = highest_inflation[year].round(1)
+    # Remove entries without reported inflation data for the selected year to ensure accurate analysis.
+    df_year.dropna(subset=[year], inplace=True)
+    
+    # Convert inflation data to numeric, ensuring calculations can be performed; non-convertible data is set to NaN.
+    df_year.loc[:, year] = pd.to_numeric(df_year[year], errors='coerce')
+    
+    # Remove any entries that could not be converted to numeric, ensuring the remaining dataset is clean.
+    df_year.dropna(subset=[year], inplace=True)
+    
+    # Sort the cleaned dataset by inflation rate to easily identify the highest and lowest values.
+    df_sorted = df_year.sort_values(by=year)
+
+    # Extract the six countries with the lowest and highest inflation rates for detailed analysis.
+    # Before modifying the inflation values, I use .copy() to explicitly create a copy of the DataFrame slices.
+    # This ensures that the original DataFrame is not affected by the modifications made to these slices.
+    lowest_inflation = df_sorted.head(6).copy()
+    # Use .copy() and sort highest_inflation in ascending order to ensure it's displayed from lowest to highest.
+    highest_inflation = df_sorted.tail(6).copy().sort_values(by=year, ascending=True)
+
+    # Now that lowest_inflation and highest_inflation are explicitly copied,
+    # I can safely round the inflation values to one decimal place without triggering a warning.
+    lowest_inflation.loc[:, year] = lowest_inflation[year].round(1)
+    highest_inflation.loc[:, year] = highest_inflation[year].round(1)
 
     # Plotting
+    # Combine the two subsets for a consolidated view, facilitating comparison in a single visualization.
     combined_inflation = pd.concat([lowest_inflation, highest_inflation])
+    # Visualize the selected data as a bar chart, providing a clear graphical representation of the extremes.
     plt.figure(figsize=(10, 5))
     plt.bar(combined_inflation['Land'], combined_inflation[year], color='blue')
     plt.xlabel('Country')
     plt.ylabel('Change [%]')
     plt.title(f'The lowest and highest inflation rates measured in {year}')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.xticks(rotation=45, ha='right')  # Improve label readability.
+    plt.tight_layout()  # Ensure the plot is neatly arranged without label cut-offs.
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)  # Enhance plot readability with a grid.
     plt.show()
 
+    # Present the analysis results in a table format, offering a clear, concise textual representation.
     # Formatting and printing the table
+    # Print a line of equal signs.
     print("="*85)
+
+    # Print the title of the table, centered between two sets of tab characters.
     print("\t\tCOUNTRIES WITH THE HIGHEST AND LOWEST INFLATION")
+
+    # Print the year being analyzed, formatted within the title
     print(f"\t\t\t\tYEAR {year}")
+
+    # Print a line of dashes
     print("-"*85)
-    print("\tLowest\t\t\t\t\t\t\tHIGHEST")
+
+    # The use of tab characters and spaces ensures that the headers are aligned with the corresponding data columns.
+    print("\tLowest\t\t\t\t\t\t\tHighest")
+
+    # Print sub-headers for each category ('Lowest' and 'Highest'), with 'Country' and 'inflation [%]' as column titles.
     print("\t------\t\t\t\t\t\t\t-------")
     print("Country\t\tinflation [%]\t\tCountry\t\t\t\tinflation[%]")
 
+    # Iterate over the rows of the 'lowest_inflation' and 'highest_inflation' DataFrames simultaneously using zip().
+    # 'iterrows()' is used to iterate through DataFrame rows as (index, Series) pairs, providing access to each row's data.
     for low, high in zip(lowest_inflation.iterrows(), highest_inflation.iterrows()):
+        # For each pair of rows, print the country name and inflation rate, formatted to align with the table headers.
+        # The '<' character in the format specification aligns the text to the left, ensuring a tidy columnar display.
+        # Numbers within the curly braces denote the minimum field width, providing consistent spacing between columns.
         print(f"{low[1]['Land']:<15}{low[1][year]:<25}{high[1]['Land']:<32}{high[1][year]:<15}")
 
+# Execute
 analyze_inflation(df_CPI_merged_with_Regions)
